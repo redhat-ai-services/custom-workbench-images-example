@@ -1,0 +1,19 @@
+FROM registry.redhat.io/ubi9/python-311@sha256:60c3a921fe569585b13b0b4bc99ea5f99fcfa89662b8472aed9db7eb917f96bc
+
+ENV VERSION=4.23.1
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+USER 0
+
+RUN curl -fOL https://github.com/coder/code-server/releases/download/v$VERSION/code-server-$VERSION-amd64.rpm && \
+    rpm -i code-server-$VERSION-amd64.rpm && \
+    rm -f code-server-$VERSION-amd64.rpm
+
+USER 1001
+
+EXPOSE 8888
+
+ENTRYPOINT ["code-server"]
+CMD ["--bind-addr=0.0.0.0:8888", "--disable-telemetry", "--auth=none", "--disable-update-check", "/opt/app-root/src"]
