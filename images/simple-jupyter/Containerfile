@@ -1,9 +1,11 @@
 FROM registry.redhat.io/ubi9/python-311@sha256:60c3a921fe569585b13b0b4bc99ea5f99fcfa89662b8472aed9db7eb917f96bc
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY --chown=1001:0 requirements.txt .
+COPY --chown=1001:0 start-notebook.sh /opt/app-root/bin
+
+RUN pip install -r requirements.txt && \
+    fix-permissions /opt/app-root -P
 
 EXPOSE 8888
 
-ENTRYPOINT ["jupyter"]
-CMD ["lab", "--ip=0.0.0.0", "--ServerApp.token=''", "--ServerApp.password=''"]
+ENTRYPOINT ["start-notebook.sh"]
