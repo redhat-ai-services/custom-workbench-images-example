@@ -1,0 +1,39 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: ai-workbench-pipelines-event-listener
+  namespace: ai-workbench-pipelines
+spec:
+  namespaceSelector: {}
+  resources: {}
+  serviceAccountName: pipeline
+  triggers:
+    - bindings:
+        - kind: ClusterTriggerBinding
+          ref: github-push
+      interceptors:
+        - params:
+            - name: secretRef
+              value: null
+            - name: eventTypes
+              value:
+                - push
+          ref:
+            kind: ClusterInterceptor
+            name: github
+        - params:
+            - name: "filter"
+              value: 'header.match("X-GitHub-Event", "push") && extensions.changed_files.matches("app-1/src/")'
+            - name: filter
+              value: 'body.ref in [''refs/heads/main'', ''refs/heads/master'']'
+            - name: overlays
+              value:
+                - expression: >-
+                    body.ref.split('/')[1] == 'heads' ? body.ref.split('/')[2] :
+                    body.ref.split('/')[1]
+                  key: branch_name
+          ref:
+            kind: ClusterInterceptor
+            name: cel
+      template:
+        ref: trigger-template-tag-build-and-deploy-l8hh6v
