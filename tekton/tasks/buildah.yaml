@@ -63,6 +63,7 @@ spec:
     image: $(params.BUILDER_IMAGE)
     name: build-and-push
     script: |
+      #If we have credentials for the source registry
       if [[ "$(workspaces.src-docker.bound)" == "true" ]]; then
 
         # if config.json exists at workspace root, we use that
@@ -87,6 +88,7 @@ spec:
 
       [[ "$(params.SKIP_PUSH)" == "true" ]] && echo "Push skipped" && exit 0
 
+      #If we have credentials for the destination registry
       if [[ "$(workspaces.dockerconfig.bound)" == "true" ]]; then
 
         # if config.json exists at workspace root, we use that
