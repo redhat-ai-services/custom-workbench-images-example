@@ -27,6 +27,10 @@ spec:
     description: additional arguments
     name: extra_args
     type: string
+  - default: .
+    description: Path to the directory to use as context.
+    name: context
+    type: string
   steps:
   - args:
     - $(params.tags)
@@ -54,6 +58,17 @@ spec:
           docker://$(params.registry)/$(params.source_image)@$(params.source_digest) \
           docker://$(params.registry)/$(params.source_image):$tag
       done
+
+      semver_tag=$(cat /workspace/output/$(params.context)/VERSION)
+      
+      skopeo copy $CRED \
+          --src-tls-verify=$(params.tls_verify) \
+          --dest-tls-verify=$(params.tls_verify) \
+          $(params.extra_args) \
+          docker://$(params.registry)/$(params.source_image)@$(params.source_digest) \
+          docker://$(params.registry)/$(params.source_image):$semver_tag
   workspaces:
   - description: Docker registry credentials
     name: creds
+  - description: Docker output directory
+    name: output

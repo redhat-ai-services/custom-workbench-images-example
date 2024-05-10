@@ -9,26 +9,32 @@ spec:
   - description: The git repo to pull from
     name: gitrepo
     type: string
+    default: https://github.com/redhat-ai-services/custom-workbench-images-example.git
   - description: The image and tag to build
     name: imgname
     type: string
+    default: simple-jupyter #temporary default for testing
   - description: The git revision
     name: gitrev
     type: string
+    default: main
   - description: The registry name
     name: registry
     type: string
+    default: quay.io/rh_ee_akugel #temporary default for testing
   - description: The image tag
     name: imgtag
     type: string
-  - default: wordpress/website
-    name: kustomize-dir
-    type: string
-  - name: manifest-repo
-    type: string
-  - description: Where file
+    default: latest #temporary default for testing
+  # - default: wordpress/website
+  #   name: kustomize-dir
+  #   type: string
+  # - name: manifest-repo
+  #   type: string
+  - description: The context for the container build
     name: context
     type: string
+    default: images/simple-jupyter #temporary default for testing
   tasks:
   - name: buildah
     params:
@@ -80,6 +86,8 @@ spec:
       value: "true"
     - name: extra_args
       value: ""
+    - name: context
+      value: $(params.context)
     runAfter:
     - buildah
     taskRef:
@@ -88,6 +96,8 @@ spec:
     workspaces:
     - name: creds
       workspace: dockercred
+    - name: output
+      workspace: output
   - name: git-clone
     params:
     - name: url
