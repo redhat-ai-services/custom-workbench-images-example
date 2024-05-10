@@ -2,14 +2,8 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   annotations:
-    kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"tekton.dev/v1","kind":"Task","metadata":{"annotations":{},"name":"add-tags","namespace":"default"},"spec":{"description":"This Task add additional tags to a docker image","params":[{"description":"The output registry","name":"registry"},{"description":"The image to retag","name":"source_image"},{"description":"The source digest","name":"source_digest"},{"description":"additional tags","name":"tags","type":"array"},{"default":"true","description":"Validate TLS connection","name":"tls_verify"},{"default":"","description":"additional arguments","name":"extra_args"}],"steps":[{"args":["$(params.tags)"],"image":"registry.redhat.io/ubi9/skopeo@sha256:0c1b2a4e99d715a3023d0a2e934b6d5d4154afc556ccd24314251b9add0654ad","name":"re-tag","script":"#!/bin/bash\nset -xe\n\nCRED_FILE=\"$(workspaces.creds.path)/.dockerconfigjson\"\nif [[ -f \"${CRED_FILE}\" ]]; then\n    echo \"Using provided credentials\"\n    CRED=\"--dest-authfile ${CRED_FILE} --src-authfile ${CRED_FILE}\"\nfi\n\nTAGS=($@)\n\nfor tag in \"${TAGS[@]}\"; do\n  skopeo copy \\\n    $CRED \\\n    --src-tls-verify=$(params.tls_verify) \\\n    --dest-tls-verify=$(params.tls_verify) \\\n    $(params.extra_args) \\\n    docker://$(params.registry)/$(params.source_image)@$(params.source_digest) \\\n    docker://$(params.registry)/$(params.source_image):$tag\ndone"}],"workspaces":[{"description":"Docker registry credentials","name":"creds"}]}}
-  creationTimestamp: "2024-05-10T08:35:12Z"
-  generation: 1
   name: add-tags
   namespace: default
-  resourceVersion: "246610"
-  uid: 47660fc4-3b8a-4115-bccc-a689b81034fb
 spec:
   description: This Task add additional tags to a docker image
   params:
