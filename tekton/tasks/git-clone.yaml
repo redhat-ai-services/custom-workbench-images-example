@@ -10,7 +10,7 @@ metadata:
   labels:
     app.kubernetes.io/version: "0.9"
   name: git-clone
-  namespace: default
+  namespace: ai-workbench-pipelines 
 spec:
   description: |-
     These Tasks are Git tasks to work with repositories used by other tasks in your Pipeline.

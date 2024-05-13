@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - build-push.yaml
 - event-listener.yaml
+#- pipeline-run.yaml

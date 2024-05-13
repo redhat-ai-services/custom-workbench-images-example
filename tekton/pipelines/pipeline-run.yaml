@@ -1,0 +1,50 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  generateName: build-push-
+  #name: build-push-initial-run
+  namespace: ai-workbench-pipelines
+  finalizers:
+    - chains.tekton.dev/pipelinerun
+  labels:
+    tekton.dev/pipeline: build-push
+spec:
+  params:
+    - name: gitrepo
+      value: 'https://github.com/redhat-ai-services/custom-workbench-images-example.git'
+    - name: imgname
+      value: simple-jupyter
+    - name: gitrev
+      value: main
+    - name: registry
+      value: quay.io/rh_ee_akugel
+    - name: imgtag
+      value: latest
+    - name: context
+      value: images/simple-jupyter
+  pipelineRef:
+    name: build-push
+  taskRunTemplate:
+    serviceAccountName: pipeline
+  timeouts:
+    pipeline: 1h0m0s
+  workspaces:
+    - name: output
+      volumeClaimTemplate:
+        metadata:
+          creationTimestamp: null
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+          storageClassName: gp3-csi # this will need to change if not on aws
+          volumeMode: Filesystem
+        status: {}
+    - name: dockercred
+      secret:
+        secretName: rh-ee-akugel-tektonic-pull-secret
+    - name: src-docker
+      secret:
+        secretName: redhatregistryio

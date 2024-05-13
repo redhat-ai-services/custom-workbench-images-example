@@ -3,7 +3,7 @@ kind: Task
 metadata:
   annotations:
   name: add-tags
-  namespace: default
+  namespace: ai-workbench-pipelines 
 spec:
   description: This Task add additional tags to a docker image
   params:
