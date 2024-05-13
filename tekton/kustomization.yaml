@@ -4,5 +4,6 @@ kind: Kustomization
 namespace: ai-workbench-pipelines 
 
 resources:
+- namespace.yaml
 - pipelines
 - tasks
