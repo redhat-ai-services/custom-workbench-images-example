@@ -2,8 +2,8 @@ apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   generateName: build-push-
-  #name: build-push-initial-run
-  namespace: ai-workbench-pipelines
+  name: build-push-initial-run
+  #namespace: ai-workbench-pipelines
   finalizers:
     - chains.tekton.dev/pipelinerun
   labels:
