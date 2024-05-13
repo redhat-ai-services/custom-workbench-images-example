@@ -26,11 +26,6 @@ spec:
     name: imgtag
     type: string
     default: latest #temporary default for testing
-  # - default: wordpress/website
-  #   name: kustomize-dir
-  #   type: string
-  # - name: manifest-repo
-  #   type: string
   - description: The context for the container build
     name: context
     type: string
