@@ -1,6 +1,6 @@
 # custom-workbench-images-example
 
-This repository is meant to provide some simple examples on howto build custom Workbench Images based on some of the most common use cases. We are also providing the related Tekton pipelines to build and push these images to your image registry.
+This repository is meant to provide some simple examples on how to build custom Workbench Images based on some of the most common use cases. We are also providing the related Tekton pipelines to build and push these images to your image registry.
 
 Here is the repository map:
 
