@@ -100,7 +100,7 @@ spec:
     - name: submodules
       value: "true"
     - name: depth
-      value: "1"
+      value: "2"
     - name: sslVerify
       value: "true"
     - name: crtFileName
