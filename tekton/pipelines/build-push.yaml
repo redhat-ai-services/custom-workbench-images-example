@@ -39,6 +39,8 @@ spec:
       value: ./Containerfile
     - name: CONTEXT
       value: $(params.context)
+    - name: CONTEXT_LIST
+      value: $(tasks.git-clone.results.changed_dirs)
     - name: TLSVERIFY
       value: "true"
     - name: FORMAT

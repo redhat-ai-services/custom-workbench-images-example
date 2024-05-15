@@ -30,6 +30,9 @@ spec:
     description: Path to the directory to use as context.
     name: CONTEXT
     type: string
+  - default: ""
+    name: CONTEXT_LIST
+    description: A comma separated list of contexts
   - default: "true"
     description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS
       registry)
@@ -81,36 +84,44 @@ spec:
           exit 1
         fi
       fi
-      buildah --storage-driver=$(params.STORAGE_DRIVER) bud \
-        $(params.BUILD_EXTRA_ARGS) --format=$(params.FORMAT) \
-        --tls-verify=$(params.TLSVERIFY) --no-cache \
-        -f $(params.DOCKERFILE) -t $(params.IMAGE) $(params.CONTEXT)
 
-      [[ "$(params.SKIP_PUSH)" == "true" ]] && echo "Push skipped" && exit 0
+      echo "The below is the context_list"
+      echo "$(params.CONTEXT_LIST)"
+      context_list="$(params.CONTEXT_LIST)"
+      
+      for context in $(echo $context_list | tr ',' "\n"); do
 
-      #If we have credentials for the destination registry
-      if [[ "$(workspaces.dockerconfig.bound)" == "true" ]]; then
+        buildah --storage-driver=$(params.STORAGE_DRIVER) bud \
+          $(params.BUILD_EXTRA_ARGS) --format=$(params.FORMAT) \
+          --tls-verify=$(params.TLSVERIFY) --no-cache \
+          -f $(params.DOCKERFILE) -t $(params.IMAGE) $context
 
-        # if config.json exists at workspace root, we use that
-        if test -f "$(workspaces.dockerconfig.path)/config.json"; then
-          export DOCKER_CONFIG="$(workspaces.dockerconfig.path)"
+        [[ "$(params.SKIP_PUSH)" == "true" ]] && echo "Push skipped" && exit 0
 
-        # else we look for .dockerconfigjson at the root
-        elif test -f "$(workspaces.dockerconfig.path)/.dockerconfigjson"; then
-          cp "$(workspaces.dockerconfig.path)/.dockerconfigjson" "$HOME/.docker/config.json"
-          export DOCKER_CONFIG="$HOME/.docker"
+        #If we have credentials for the destination registry
+        if [[ "$(workspaces.dockerconfig.bound)" == "true" ]]; then
 
-        # need to error out if neither files are present
-        else
-          echo "neither 'config.json' nor '.dockerconfigjson' found at workspace root"
-          exit 1
+          # if config.json exists at workspace root, we use that
+          if test -f "$(workspaces.dockerconfig.path)/config.json"; then
+            export DOCKER_CONFIG="$(workspaces.dockerconfig.path)"
+
+          # else we look for .dockerconfigjson at the root
+          elif test -f "$(workspaces.dockerconfig.path)/.dockerconfigjson"; then
+            cp "$(workspaces.dockerconfig.path)/.dockerconfigjson" "$HOME/.docker/config.json"
+            export DOCKER_CONFIG="$HOME/.docker"
+
+          # need to error out if neither files are present
+          else
+            echo "neither 'config.json' nor '.dockerconfigjson' found at workspace root"
+            exit 1
+          fi
         fi
-      fi
+        buildah --storage-driver=$(params.STORAGE_DRIVER) push \
+          $(params.PUSH_EXTRA_ARGS) --tls-verify=$(params.TLSVERIFY) \
+          --digestfile /tmp/image-digest $(params.IMAGE) \
+          docker://$(params.IMAGE)
 
-      buildah --storage-driver=$(params.STORAGE_DRIVER) push \
-        $(params.PUSH_EXTRA_ARGS) --tls-verify=$(params.TLSVERIFY) \
-        --digestfile /tmp/image-digest $(params.IMAGE) \
-        docker://$(params.IMAGE)
+      done
       cat /tmp/image-digest | tee $(results.IMAGE_DIGEST.path)
       echo "$(params.IMAGE)" | tee $(results.IMAGE_URL.path)
     securityContext:

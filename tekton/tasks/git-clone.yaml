@@ -94,6 +94,9 @@ spec:
   - description: The epoch timestamp of the commit that was fetched by this Task.
     name: committer-date
     type: string
+  - description: A comma separated list of image subdirectories that were modified.
+    name: changed_dirs
+    type: string
   steps:
   - computeResources: {}
     env:
@@ -219,9 +222,10 @@ spec:
       printf "%s" "${PARAM_URL}" > "$(results.url.path)"
       CHANGED_DIRS=$(git diff HEAD~1 HEAD --name-only | grep \
         images/ | xargs -r -n 1 dirname | sort -u | tr '\n' ',')
+      CHANGED_DIRS=${CHANGED_DIRS%,}
+      echo -n "$CHANGED_DIRS" > $(results.changed_dirs.path)
       echo $CHANGED_DIRS
-      git diff HEAD~1 HEAD --name-only
-      git log 
+
     securityContext:
       runAsNonRoot: true
       runAsUser: 65532
