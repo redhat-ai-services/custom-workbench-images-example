@@ -5,6 +5,8 @@ FROM registry.redhat.io/ubi9/python-311@sha256:60c3a921fe569585b13b0b4bc99ea5f99
 ###############################
 
 ### https://developer.nvidia.com/cuda-downloads
+### https://hub.docker.com/r/nvidia/cuda
+### https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/12.4.1/ubi9/base/Dockerfile
 
 USER 0
 
