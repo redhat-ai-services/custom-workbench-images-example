@@ -23,7 +23,7 @@ spec:
             name: github
         - params:
             # - name: "filter"
-            #   value: 'header.match("X-GitHub-Event", "push") && extensions.changed_files.matches("/images/")'
+            #   value: 'header.match("X-GitHub-Event", "push") && extensions.changed_files.matches("images/")'
             - name: filter
               value: 'body.ref in [''refs/heads/main'', ''refs/heads/master'']'
             - name: overlays
@@ -36,4 +36,4 @@ spec:
             kind: ClusterInterceptor
             name: cel
       template:
-        ref: trigger-template-tag-build-and-deploy-l8hh6v
+        ref: ai-workbench-pipelines-trigger-template

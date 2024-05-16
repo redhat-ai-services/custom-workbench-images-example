@@ -15,19 +15,53 @@ spec:
    spec:
      pipelineRef:
        name: build-push
-     resources:
-       - name: app-source
-         resourceSpec:
-           type: git
-           params:
-           - name: revision
-             value: $(params.gitrevision)
-           - name: url
-             value: $(params.gitrepositoryurl)
+    #  resources:
+    #    - name: app-source
+    #      resourceSpec:
+    #        type: git
+    #        params:
+    #        - name: revision
+    #          value: $(params.gitrevision)
+    #        - name: url
+    #          value: $(params.gitrepositoryurl)
      Params:
-       - name: title
-         value: $(params.pull_request_title)
-       - name: revision
-         value: $(params.gitrevision)
-       - name: url
-         value: $(params.gitrepositoryurl)
+      #  - name: title
+      #    value: $(params.pull_request_title)
+      #  - name: revision
+      #    value: $(params.gitrevision)
+      #  - name: url
+      #    value: $(params.gitrepositoryurl)
+
+        - name: gitrepo
+          value: https://github.com/redhat-ai-services/custom-workbench-images-example.git
+        - name: imgname
+          value: simple-jupyter
+        - name: gitrev
+          value: main
+        - name: registry
+          value: quay.io/rh_ee_akugel
+        - name: imgtag
+          value: latest
+        - name: context
+          value: images/simple-jupyter
+
+     workspaces:
+        - name: output
+          volumeClaimTemplate:
+            metadata:
+              creationTimestamp: null
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 1Gi
+              storageClassName: gp3-csi # this will need to change if not on aws
+              volumeMode: Filesystem
+            status: {}
+        - name: dockercred
+          secret:
+            secretName: rh-ee-akugel-tektonic-pull-secret
+        - name: src-docker
+          secret:
+            secretName: redhatregistryio

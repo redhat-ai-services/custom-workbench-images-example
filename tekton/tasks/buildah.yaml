@@ -90,11 +90,16 @@ spec:
       context_list="$(params.CONTEXT_LIST)"
       
       for context in $(echo $context_list | tr ',' "\n"); do
+      
+        echo $context
+        tag=$(cat $context/VERSION)
+        image=quay.io/rh_ee_akugel/$(echo $context| cut -d "/" -f 2):$tag
+        echo $image
 
         buildah --storage-driver=$(params.STORAGE_DRIVER) bud \
           $(params.BUILD_EXTRA_ARGS) --format=$(params.FORMAT) \
           --tls-verify=$(params.TLSVERIFY) --no-cache \
-          -f $(params.DOCKERFILE) -t $(params.IMAGE) $context
+          -f $(params.DOCKERFILE) -t $image $context
 
         [[ "$(params.SKIP_PUSH)" == "true" ]] && echo "Push skipped" && exit 0
 
@@ -118,12 +123,12 @@ spec:
         fi
         buildah --storage-driver=$(params.STORAGE_DRIVER) push \
           $(params.PUSH_EXTRA_ARGS) --tls-verify=$(params.TLSVERIFY) \
-          --digestfile /tmp/image-digest $(params.IMAGE) \
-          docker://$(params.IMAGE)
+          --digestfile /tmp/image-digest $image \
+          docker://$image
 
       done
       cat /tmp/image-digest | tee $(results.IMAGE_DIGEST.path)
-      echo "$(params.IMAGE)" | tee $(results.IMAGE_URL.path)
+      echo "$image" | tee $(results.IMAGE_URL.path)
     securityContext:
       capabilities:
         add:

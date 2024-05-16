@@ -5,3 +5,4 @@ resources:
 - event-listener.yaml
 - event-listener-route.yaml
 - pipeline-run.yaml
+- trigger-template.yaml
