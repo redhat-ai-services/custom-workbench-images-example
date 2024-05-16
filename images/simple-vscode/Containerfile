@@ -3,7 +3,8 @@ FROM registry.redhat.io/ubi9/python-311@sha256:60c3a921fe569585b13b0b4bc99ea5f99
 ENV VERSION=4.23.1
 
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt \
+    fix-permissions /opt/app-root -P
 
 USER 0
 
