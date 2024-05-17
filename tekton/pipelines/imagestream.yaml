@@ -1,0 +1,21 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: is-template
+  annotations:
+    description: "Template for image streams"
+objects:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: ${IMAGE_NAME}
+      template: is
+    name: ${IMAGE_NAME}
+    namespace: ai-workbench-pipelines
+    tag: ${IMAGE_TAG}
+parameters:
+- description: The name of the image
+  name: IMAGE_NAME
+- description: The tag of the image
+  name: IMAGE_TAG
