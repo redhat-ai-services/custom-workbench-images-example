@@ -1,12 +1,33 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: ai-workbench-trigger-binding
+spec:
+  params:
+    - name: git-revision
+      value: $(body.head_commit.id)
+    - name: git-commit-message
+      value: $(body.head_commit.message)
+    - name: git-repo-url
+      value: $(body.repository.url)
+    - name: git-repo-name
+      value: $(body.repository.name)
+    - name: content-type
+      value: $(header.Content-Type)
+    - name: pusher-name
+      value: $(body.pusher.name)
+    - name: modified-files
+      value: $(body.head_commit.modified)
+---
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
  name: ai-workbench-pipelines-trigger-template
 spec:
  params:
- - name: gitrevision
- - name: gitrepositoryurl
- - name: pull_request_title
+ - name: git-repo-url
+#  - name: gitrepositoryurl
+#  - name: pull_request_title
  resourcetemplates:
  - apiVersion: tekton.dev/v1beta1
    kind: PipelineRun
@@ -15,25 +36,9 @@ spec:
    spec:
      pipelineRef:
        name: build-push
-    #  resources:
-    #    - name: app-source
-    #      resourceSpec:
-    #        type: git
-    #        params:
-    #        - name: revision
-    #          value: $(params.gitrevision)
-    #        - name: url
-    #          value: $(params.gitrepositoryurl)
-     Params:
-      #  - name: title
-      #    value: $(params.pull_request_title)
-      #  - name: revision
-      #    value: $(params.gitrevision)
-      #  - name: url
-      #    value: $(params.gitrepositoryurl)
-
+     params:
         - name: gitrepo
-          value: https://github.com/redhat-ai-services/custom-workbench-images-example.git
+          value: $(tt.params.git-repo-url)
         - name: imgname
           value: simple-jupyter
         - name: gitrev

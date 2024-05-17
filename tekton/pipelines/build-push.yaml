@@ -9,7 +9,6 @@ spec:
   - description: The git repo to pull from
     name: gitrepo
     type: string
-    default: https://github.com/redhat-ai-services/custom-workbench-images-example.git
   - description: The image and tag to build
     name: imgname
     type: string
@@ -69,7 +68,6 @@ spec:
     - name: output
       workspace: output
 
-
   - name: buildah
     params:
     - name: IMAGE
@@ -107,34 +105,17 @@ spec:
     - name: src-docker
       workspace: src-docker
 
-
-  # - name: add-tags
+  # - name: create-image-stream
   #   params:
-  #   - name: registry
-  #     value: $(params.registry)
-  #   - name: source_image
-  #     value: $(params.imgname)
-  #   - name: source_digest
-  #     value: $(tasks.buildah.results.IMAGE_DIGEST)
-  #   - name: tags
-  #     value:
-  #     - $(params.imgtag)
-  #     - latest
-  #   - name: tls_verify
-  #     value: "true"
-  #   - name: extra_args
-  #     value: ""
-  #   - name: context
-  #     value: $(params.context)
+  #   - name: script
+  #     value: oc process -f <filename> | oc create -f -
   #   runAfter:
   #   - buildah
   #   taskRef:
-  #     kind: Task
-  #     name: add-tags
+  #     kind: ClusterTask
+  #     name: openshift-client
   #   workspaces:
-  #   - name: creds
-  #     workspace: dockercred
-  #   - name: output
+  #   - name: manifest-dir
   #     workspace: output
 
   workspaces:

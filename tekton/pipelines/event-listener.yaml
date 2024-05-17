@@ -4,36 +4,19 @@ metadata:
   name: ai-workbench-pipelines-event-listener
   namespace: ai-workbench-pipelines
 spec:
-  namespaceSelector: {}
-  resources: {}
   serviceAccountName: pipeline
   triggers:
-    - bindings:
-        - kind: ClusterTriggerBinding
-          ref: github-push
+    - name: github-listener
       interceptors:
-        - params:
-            - name: secretRef
-              value: null
-            - name: eventTypes
-              value:
-                - push
-          ref:
-            kind: ClusterInterceptor
-            name: github
-        - params:
-            # - name: "filter"
-            #   value: 'header.match("X-GitHub-Event", "push") && extensions.changed_files.matches("images/")'
+        - name: Validate github payload and filter on eventype
+          params:
             - name: filter
               value: 'body.ref in [''refs/heads/main'', ''refs/heads/master'']'
-            - name: overlays
-              value:
-                - expression: >-
-                    body.ref.split('/')[1] == 'heads' ? body.ref.split('/')[2] :
-                    body.ref.split('/')[1]
-                  key: branch_name
           ref:
             kind: ClusterInterceptor
             name: cel
+      bindings:
+        - ref: ai-workbench-trigger-binding
       template:
         ref: ai-workbench-pipelines-trigger-template
+        
