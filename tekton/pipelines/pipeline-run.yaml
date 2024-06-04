@@ -17,7 +17,8 @@ spec:
     - name: gitrev
       value: main
     - name: registry
-      value: quay.io/rh_ee_akugel
+      #value: quay.io/rh_ee_akugel
+      value: image-registry.openshift-image-registry.svc:5000/ai-workbench-pipelines
     - name: imgtag
       value: latest
     - name: context
@@ -44,7 +45,7 @@ spec:
         status: {}
     - name: dockercred
       secret:
-        secretName: rh-ee-akugel-tektonic-pull-secret
+        secretName: regtoken
     - name: src-docker
       secret:
         secretName: redhatregistryio

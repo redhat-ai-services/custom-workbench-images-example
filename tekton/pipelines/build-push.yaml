@@ -80,8 +80,8 @@ spec:
       value: ./Containerfile
     - name: CONTEXT
       value: $(params.context)
-    - name: CONTEXT_LIST
-      value: $(tasks.git-clone.results.changed_dirs)
+    # - name: CONTEXT_LIST
+    #   value: $(tasks.git-clone.results.changed_dirs)
     - name: TLSVERIFY
       value: "true"
     - name: FORMAT
@@ -105,18 +105,18 @@ spec:
     - name: src-docker
       workspace: src-docker
 
-  # - name: create-image-stream
-  #   params:
-  #   - name: script
-  #     value: oc process -f <filename> | oc create -f -
-  #   runAfter:
-  #   - buildah
-  #   taskRef:
-  #     kind: ClusterTask
-  #     name: openshift-client
-  #   workspaces:
-  #   - name: manifest-dir
-  #     workspace: output
+  - name: create-image-stream
+    params:
+    - name: SCRIPT
+      value: oc import-image $(params.imgname) --confirm --from $(params.registry)/$(params.registry) --tag $(tasks.buildah.results.IMAGE_TAG)
+    runAfter:
+    - buildah
+    taskRef:
+      kind: ClusterTask
+      name: openshift-client
+    workspaces:
+    - name: manifest-dir
+      workspace: output
 
   workspaces:
   - name: output
