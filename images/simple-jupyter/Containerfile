@@ -1,4 +1,4 @@
-FROM registry.redhat.io/ubi9/python-311@sha256:60c3a921fe569585b13b0b4bc99ea5f99fcfa89662b8472aed9db7eb917f96bc
+FROM registry.access.redhat.com/ubi9/python-311@sha256:fae422b4e7dbc2e551919fb87b6004c06b731179be2ed2904427531a2d1ef3a2
 ### The image tag is 1-62.1714671026, published on 2024-05-06
 
 COPY --chown=1001:0 requirements.txt .
