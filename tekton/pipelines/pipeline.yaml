@@ -1,0 +1,107 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: workbench-test
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: new-pipeline
+  namespace: workbench-test
+spec:
+  params:
+  - default: https://github.com/redhat-ai-services/custom-workbench-images-example.git
+    name: GIT_URL
+    type: string
+  - default: test-image
+    name: GIT_REVISION
+    type: string
+  - default: images/simple-jupyter/
+    name: CONTEXT
+    type: string
+  - default: image-registry.openshift-image-registry.svc:5000/workbench-test/test
+    name: TARGET_IMAGE
+    type: string
+  tasks:
+  - name: git-clone
+    params:
+    - name: url
+      value: $(params.GIT_URL)
+    - name: revision
+      value: $(params.GIT_REVISION)
+    - name: refspec
+      value: ""
+    - name: submodules
+      value: "true"
+    - name: depth
+      value: "1"
+    - name: sslVerify
+      value: "true"
+    - name: crtFileName
+      value: ca-bundle.crt
+    - name: subdirectory
+      value: ""
+    - name: sparseCheckoutDirectories
+      value: ""
+    - name: deleteExisting
+      value: "true"
+    - name: httpProxy
+      value: ""
+    - name: httpsProxy
+      value: ""
+    - name: noProxy
+      value: ""
+    - name: verbose
+      value: "true"
+    - name: gitInitImage
+      value: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.40.2
+    - name: userHome
+      value: /home/git
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: source
+  - name: buildah
+    params:
+    - name: IMAGE
+      value: $(params.TARGET_IMAGE)
+    - name: BUILDER_IMAGE
+      value: registry.redhat.io/rhel8/buildah@sha256:b48f410efa0ff8ab0db6ead420a5d8d866d64af846fece5efb185230d7ecf591
+    - name: STORAGE_DRIVER
+      value: vfs
+    - name: DOCKERFILE
+      value: ./Containerfile
+    - name: CONTEXT
+      value: $(params.CONTEXT)
+    - name: TLSVERIFY
+      value: "true"
+    - name: FORMAT
+      value: oci
+    - name: BUILD_EXTRA_ARGS
+      value: ""
+    - name: PUSH_EXTRA_ARGS
+      value: ""
+    - name: SKIP_PUSH
+      value: "false"
+    runAfter:
+    - git-clone
+    taskRef:
+      kind: ClusterTask
+      name: buildah
+    workspaces:
+    - name: source
+      workspace: source
+  workspaces:
+  - name: source
+# ---
+# apiVersion: image.openshift.io/v1
+# kind: ImageStream
+# metadata:
+#   name: test
+#   namespace: workbench-test
+# spec:
+#   lookupPolicy:
+#     local: false
